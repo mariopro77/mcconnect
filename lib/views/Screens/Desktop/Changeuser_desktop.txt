@@ -1,0 +1,127 @@
+Documentacion 
+
+Clases y Widgets Principales
+1. ChangeuserDesktop (StatefulWidget)
+Este widget es un diálogo que permite al usuario editar la información de un empleado.
+
+Propiedades:
+
+empleado (Empleados): Objeto que contiene la información del empleado.
+onSantiagoChanged (ValueChanged<bool>): Función de callback que se invoca cuando cambia la ubicación a Santiago.
+2. ChangeuserDesktopState (State<ChangeuserDesktop>)
+Esta es la clase de estado para ChangeuserDesktop. Maneja el estado y la lógica de la interfaz de usuario.
+
+Variables de Estado:
+
+_value (String?): Tipo de compañía seleccionado.
+_selectedDepartment (String?): Departamento seleccionado.
+_isChecked (bool): Indica si la ubicación es Santiago.
+_selectedOption (Opciones): Opción seleccionada para el encabezado de la firma (departamento o posición).
+empleado (Empleados): Objeto empleado que se está editando.
+_direccionController (TextEditingController): Controlador para el campo de dirección.
+screenshotController (ScreenshotController): Controlador para capturar la firma como imagen.
+qrScreenshotController (ScreenshotController): Controlador para capturar el código QR como imagen.
+Métodos Principales:
+
+initState(): Inicializa el estado con los valores actuales del empleado.
+_pickAndUploadImage(): Permite al usuario seleccionar y subir una imagen de perfil. Utiliza file_picker para seleccionar el archivo y Dio para subirlo a un servidor.
+postUserData(): Envía los datos del empleado al servidor a través de una petición HTTP POST.
+mostrarDialogoFirma(BuildContext context): Muestra un diálogo que permite al usuario ver y descargar su firma de correo electrónico personalizada.
+buildFormFields(): Construye los campos del formulario para editar la información del empleado.
+buildButtons(): Construye los botones de acción al final del diálogo (Guardar, Eliminar, QR, Firma, Cancelar).
+build(BuildContext context): Construye el widget principal del diálogo de edición.
+Funciones Auxiliares:
+
+obtenerTextoDepartamento(String? departamento): Devuelve el texto del departamento en inglés basado en el código en español.
+obtenerImagenCompania(String? compania): Devuelve un objeto ImagenCompania que contiene las rutas de imágenes y estilos basados en el tipo de compañía.
+customInputDecoration({required String labelText}): Devuelve una decoración de entrada personalizada para los campos del formulario.
+3. ImagenCompania
+Clase que encapsula la información de imágenes y estilos para las diferentes compañías.
+
+Propiedades:
+
+path (String): Ruta de la imagen de la compañía.
+height, width (double): Dimensiones de la imagen.
+color1, color2 (Color): Colores utilizados en el diseño.
+contenedorheight, contenedorwidth (double): Dimensiones del contenedor para la firma.
+4. CustomTextFormField (StatelessWidget)
+Widget personalizado para los campos de texto del formulario. Proporciona un estilo consistente.
+
+Propiedades:
+
+labelText (String): Texto de la etiqueta del campo.
+readOnly (bool): Indica si el campo es de solo lectura.
+onChange (ValueChanged<String>?): Función de callback para cuando el valor cambia.
+initialValue (String?): Valor inicial del campo.
+controller (TextEditingController?): Controlador del campo (opcional).
+5. CustomButton (StatelessWidget)
+Widget personalizado para los botones de acción. Proporciona un estilo consistente.
+
+Propiedades:
+
+text (String): Texto del botón.
+textColor (Color): Color del texto.
+color (Color?): Color de fondo del botón.
+onPressed (VoidCallback): Función que se invoca cuando el botón es presionado.
+6. QrGenerator (StatefulWidget)
+Widget que genera un código QR basado en la información del empleado.
+
+Propiedades:
+
+empleado (Empleados): Objeto empleado con la información.
+size (double): Tamaño del código QR.
+Clases Auxiliares:
+
+QrStyling: Clase que contiene estilos para el código QR, incluyendo colores y ruta del logotipo.
+7. QRDialog (StatelessWidget)
+Diálogo que muestra el código QR y permite al usuario descargarlo.
+
+Propiedades:
+
+empleado (Empleados): Objeto empleado con la información.
+Funcionalidades Detalladas
+Carga y Subida de Imagen de Perfil
+El método _pickAndUploadImage() permite al usuario seleccionar una imagen de su dispositivo y subirla al servidor. Utiliza file_picker para seleccionar archivos en Flutter Web y Dio para realizar la petición HTTP.
+
+Pasos:
+
+El usuario toca la imagen de perfil para activar el selector de archivos.
+Se abre el diálogo de selección de archivos.
+Una vez seleccionada la imagen, se muestra un indicador de carga mientras se sube la imagen.
+Se envía la imagen al servidor en la URL https://support.consilialogistics.com/files/upload.
+Si la subida es exitosa, se actualiza la URL de la imagen en el objeto empleado y se muestra un mensaje de éxito.
+Generación y Descarga de Código QR
+El widget QrGenerator genera un código QR utilizando la información del empleado. El código QR contiene una URL personalizada basada en el nombre del empleado.
+
+Características:
+
+Utiliza el paquete qr_flutter para generar el código QR.
+Aplica un gradiente de colores personalizado según el tipo de compañía.
+Incluye el logotipo de la compañía en el centro del código QR.
+El diálogo QRDialog muestra el código QR generado y ofrece un botón para descargarlo como imagen.
+
+Generación y Descarga de Firma de Correo Electrónico
+El método mostrarDialogoFirma(BuildContext context) muestra un diálogo que contiene una vista previa de la firma de correo electrónico. Permite al usuario seleccionar si quiere mostrar el departamento o la posición en el encabezado.
+
+Características:
+
+Utiliza ScreenshotController para capturar la firma como imagen.
+Incluye información del empleado como nombre, departamento/posición, teléfono, correo electrónico, dirección, etc.
+Muestra el logotipo de la compañía y otros elementos gráficos.
+Ofrece un botón para descargar la firma como imagen.
+Edición de Información del Empleado
+El formulario permite editar diversos campos:
+
+Nombre
+Correo electrónico
+Teléfono y extensión
+Flota/Whatsapp
+Instagram
+Grupo (compañía)
+Departamento
+Posición
+Dirección (automáticamente actualizada según la compañía y ubicación)
+Al cambiar el grupo (compañía), la dirección se actualiza automáticamente. Si el empleado pertenece a McLogs, puede seleccionar si está ubicado en Santiago, lo que también actualiza la dirección.
+
+Envío de Datos al Servidor
+El método postUserData() envía la información actualizada del empleado al servidor mediante una petición HTTP POST a la URL https://support.consilialogistics.com/mclogs/persons.
