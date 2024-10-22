@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mcconnect/Providers/listaempleados.dart';
+import 'package:mcconnect/views/Screens/Desktop/Changeuser_desktop.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones_backend.dart';
 import 'package:mcconnect/views/Screens/Homescreen.dart';
@@ -8,6 +10,8 @@ import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart'; // Importa file_picker para Flutter Web
 import 'package:http_parser/http_parser.dart';
+import 'package:mcconnect/widgets/Botones/Botonesrectangulares.dart';
+import 'package:mcconnect/widgets/Campos/campopersonalizado.dart';
 import 'package:mime/mime.dart';
 import 'dart:io' show File, Platform;
 import 'dart:html' as html;
@@ -19,9 +23,9 @@ class CreateUser extends StatefulWidget {
   // For storing selected image on mobile
 
   const CreateUser({
-    Key? key,
+    super.key,
     required this.empleado,
-  }) : super(key: key);
+  });
 
   @override
   CreateUserState createState() => CreateUserState();
@@ -108,7 +112,7 @@ class CreateUserState extends State<CreateUser> {
       setState(() {
         if (kIsWeb) {
           _webImage = file.bytes;
-          _selectedImage = null; // Asegura que solo uno esté seleccionado
+          _selectedImage = null; 
         } else {
           _selectedImage = File(file.path!);
           _webImage = null;
@@ -119,7 +123,7 @@ class CreateUserState extends State<CreateUser> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(child: CircularProgressIndicator()),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
       try {
@@ -128,9 +132,7 @@ class CreateUserState extends State<CreateUser> {
         if (kIsWeb) {
           // Obtiene el tipo MIME del archivo
           String? mimeType = lookupMimeType(file.name);
-          if (mimeType == null) {
-            mimeType = 'application/octet-stream'; // Tipo MIME por defecto
-          }
+          mimeType ??= 'application/octet-stream';
           MediaType mediaType = MediaType.parse(mimeType);
 
           // Para Flutter Web, usa fromBytes
@@ -178,7 +180,7 @@ class CreateUserState extends State<CreateUser> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Imagen subida correctamente')),
+            const SnackBar(content: Text('Imagen subida correctamente')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -215,7 +217,9 @@ class CreateUserState extends State<CreateUser> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Datos enviados correctamente');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-
+        if (mounted) {
+          Navigator.of(context).pop(true); // Cierra el diálogo y retorna true
+        }
         // Manejar 'empleadoId'
         if (responseData.containsKey('empleadoId')) {
           setState(() {
@@ -372,7 +376,7 @@ class CreateUserState extends State<CreateUser> {
                               });
                             },
                             decoration: InputDecoration(
-                              label: Text("Teléfono"),
+                              label: const Text("Teléfono"),
                               labelStyle: const TextStyle(
                                   color: Colors.grey), // Estilo de la etiqueta
                               floatingLabelStyle: const TextStyle(
@@ -401,7 +405,7 @@ class CreateUserState extends State<CreateUser> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 10), // Espaciado entre campos
+                        const SizedBox(width: 10), // Espaciado entre campos
                         // Campo de texto para la extensión
                         SizedBox(
                           width: 70,
@@ -414,7 +418,7 @@ class CreateUserState extends State<CreateUser> {
                               });
                             },
                             decoration: InputDecoration(
-                              label: Text("Ext"),
+                              label: const Text("Ext"),
                               labelStyle: const TextStyle(
                                   color: Colors.grey), // Estilo de la etiqueta
                               floatingLabelStyle: const TextStyle(
@@ -468,13 +472,13 @@ class CreateUserState extends State<CreateUser> {
                         readOnly: true,
                         controller: instagramController,
                       )
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
                 const SizedBox(height: 25), // Espaciado vertical
                 // Dropdown para seleccionar el grupo
                 SizedBox(
                   width: kFieldWidth,
                   child: isLoadingDivisiones
-                      ? Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator())
                       : DropdownButtonFormField<int>(
                           decoration:
                               customInputDecoration(labelText: "División"),
@@ -520,7 +524,7 @@ class CreateUserState extends State<CreateUser> {
                             } else {
                               // Manejar el error, por ejemplo, mostrar un SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'No se pudieron cargar los detalles de la división')),
                               );
@@ -648,12 +652,6 @@ class CreateUserState extends State<CreateUser> {
                   empleado =
                       empleado; // Actualiza el estado del empleado (no es necesario aquí)
                 });
-                if (mounted) {
-                  Navigator.of(context)
-                      .pop(true); // Cierra el diálogo y retorna true
-                }
-                // Puedes cerrar el diálogo después de enviar los datos si lo deseas
-                // Navigator.of(context).pop();
               }
             },
           ),
@@ -681,7 +679,7 @@ class CreateUserState extends State<CreateUser> {
       );
       divisionName = selectedDivision.division;
     }
-
+    
     return Dialog(
       child: Container(
         height: 700, // Altura del diálogo
@@ -714,7 +712,7 @@ class CreateUserState extends State<CreateUser> {
                 ],
               ),
             ),
-
+            const SizedBox(height: 5),
             // Formulario dentro de un scroll para manejar contenido excedente
             Expanded(
               child: SingleChildScrollView(
@@ -735,96 +733,5 @@ class CreateUserState extends State<CreateUser> {
   }
 }
 
-/// Widget personalizado para campos de texto con estilos específicos.
-/// Extiende de [StatelessWidget].
-class CustomTextFormField extends StatelessWidget {
-  final String labelText; // Texto de la etiqueta del campo
-  final bool readOnly; // Determina si el campo es de solo lectura
-  final ValueChanged<String>? onChange; // Callback para cambios en el texto
-  final FormFieldValidator<String>?
-      validator; // Función de validación del campo
-  final TextEditingController? controller; // Controlador del campo de texto
 
-  const CustomTextFormField({
-    super.key,
-    required this.labelText,
-    this.readOnly = false,
-    this.onChange,
-    this.validator,
-    this.controller,
-  });
 
-  static const double kFieldWidth = 250.0; // Ancho constante para los campos
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: kFieldWidth, // Define el ancho del campo
-      child: TextFormField(
-        controller: controller, // Asigna el controlador si existe
-        readOnly: readOnly, // Asigna la propiedad de solo lectura
-        textAlign: TextAlign.start, // Alineación del texto
-        decoration: InputDecoration(
-          labelText: labelText, // Texto de la etiqueta
-          labelStyle:
-              const TextStyle(color: Colors.grey), // Estilo de la etiqueta
-          floatingLabelStyle: const TextStyle(
-              color: Colors.black), // Estilo de la etiqueta flotante
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-            borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 1.0), // Color y grosor del borde cuando está habilitado
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-            borderSide: const BorderSide(
-                color: Color(0xFF17A2B8),
-                width: 2.0), // Color y grosor del borde cuando está enfocado
-          ),
-        ),
-        onChanged: onChange, // Asigna el callback de cambios si existe
-        cursorColor: Colors.black, // Color del cursor
-        maxLines: null, // Permite múltiples líneas si es necesario
-        style:
-            const TextStyle(color: Colors.black), // Estilo del texto ingresado
-        validator: validator, // Asigna la función de validación si existe
-      ),
-    );
-  }
-}
-
-/// Widget personalizado para botones con estilos específicos.
-/// Extiende de [StatelessWidget].
-class CustomButton extends StatelessWidget {
-  final String text; // Texto que se muestra en el botón
-  final Color color; // Color de fondo del botón
-  final VoidCallback onPressed; // Callback que se ejecuta al presionar el botón
-
-  const CustomButton({
-    Key? key,
-    required this.text,
-    required this.color,
-    required this.onPressed,
-  }) : super(key: key);
-
-  static const EdgeInsets kButtonPadding = EdgeInsets.symmetric(
-      horizontal: 40, vertical: 20); // Padding constante para los botones
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: onPressed, // Asigna la función al presionar el botón
-      style: FilledButton.styleFrom(
-        backgroundColor: color, // Color de fondo del botón
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10)), // Bordes redondeados
-        padding: kButtonPadding, // Padding interno del botón
-      ),
-      child: Text(text), // Texto que se muestra en el botón
-    );
-  }
-}

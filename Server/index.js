@@ -186,12 +186,11 @@ app.post('/api/agregarempleado', async (req, res) => {
         posicion_empleado,
         departamento,
         id_division,
-        imagen_empleado, // URL de la imagen subida
+        imagen_empleado,
+        correo_empleado 
     } = req.body;
 
     try {
-        // Obtener el id_division correspondiente al nombre_division
-
         // Obtener el id_departamento correspondiente al nombre_departamento
         const departamentoQuery = 'SELECT id_departamento FROM departamento WHERE departamento = $1';
         const departamentoResult = await pool.query(departamentoQuery, [departamento]);
@@ -200,7 +199,7 @@ app.post('/api/agregarempleado', async (req, res) => {
             return res.status(400).json({ error: 'Nombre de departamento no válido' });
         }
 
-        const id_departamento = departamentoResult.rows[0].id_departamento; // Corregido
+        const id_departamento = departamentoResult.rows[0].id_departamento;
 
         // Obtener el id_estado correspondiente a 'Activo'
         const estadoQuery = "SELECT id_estado FROM estado WHERE estado = 'Activo'";
@@ -215,25 +214,39 @@ app.post('/api/agregarempleado', async (req, res) => {
         // Consulta para insertar un nuevo empleado
         const query = `
             INSERT INTO public.empleado 
-            (nombre_empleado, telefono_empleado, flota_empleado, extension_empleado, qr_empleado, 
-             fecha_creacion_empleado, imagen_empleado, web_empleado, posicion_empleado, id_departamento, id_division, id_estado)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            (
+                nombre_empleado, 
+                telefono_empleado, 
+                flota_empleado, 
+                extension_empleado, 
+                qr_empleado, 
+                fecha_creacion_empleado, 
+                imagen_empleado, 
+                web_empleado, 
+                posicion_empleado, 
+                correo_empleado, 
+                id_departamento, 
+                id_division, 
+                id_estado
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING id_empleado;
         `;
 
         const values = [
             nombre_empleado,
             telefono_empleado || null,
-            flota_empleado || null,
-            extension_empleado || null,
-            qr_empleado || null,
-            fecha_creacion_empleado || null,
-            imagen_empleado || null, // Usa la URL de la imagen
-            web_empleado || null,
-            posicion_empleado || null,
-            parseInt(id_departamento),
-            id_division,
-            id_estado
+            flota_empleado || null,          // $3
+            extension_empleado || null,      // $4
+            qr_empleado || null,             // $5
+            fecha_creacion_empleado || null, // $6
+            imagen_empleado || null,         // $7
+            web_empleado || null,            // $8
+            posicion_empleado || null,       // $9
+            correo_empleado || null,         // $10
+            parseInt(id_departamento),       // $11
+            id_division,                     // $12
+            id_estado                        // $13
         ];
 
         const result = await pool.query(query, values);
@@ -245,6 +258,7 @@ app.post('/api/agregarempleado', async (req, res) => {
         res.status(500).json({ error: 'Error al agregar el empleado' });
     }
 });
+
 
 //Ruta para actualizar empleado
 app.put('/api/actualizarempleado/:id', async (req, res) => {
@@ -310,8 +324,8 @@ app.put('/api/actualizarempleado/:id', async (req, res) => {
 
         if (estado !== undefined) {
 
-            const estadoQuery = "SELECT id_estado FROM estado WHERE estado = 'Activo'";
-            const estadoResult = await pool.query(estadoQuery);
+            const estadoQuery = "SELECT id_estado FROM estado WHERE estado = $1";
+            const estadoResult = await pool.query(estadoQuery, [estado]);
 
             if (estadoResult.rowCount === 0) {
                 return res.status(500).json({ error: "Estado 'Activo' no encontrado en la base de datos" });

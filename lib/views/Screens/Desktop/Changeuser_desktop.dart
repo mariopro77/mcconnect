@@ -7,12 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mcconnect/Decoraciones/decoracioninput.dart';
+import 'package:mcconnect/Providers/listaempleados.dart';
+import 'package:mcconnect/Providers/visibilidadusuarios.dart';
+import 'package:mcconnect/views/Screens/Desktop/Contacto.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones_backend.dart';
 import 'package:mcconnect/views/Screens/Homescreen.dart';
 import 'package:file_picker/file_picker.dart'; // Importa file_picker para Flutter Web
 import 'package:http_parser/http_parser.dart';
+import 'package:mcconnect/widgets/Botones/Botonesrectangulares.dart';
+import 'package:mcconnect/widgets/Campos/campopersonalizado.dart';
+import 'package:mcconnect/widgets/qrgenerator/generadorqr.dart';
 import 'package:mime/mime.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:html' as html;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -71,7 +79,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
   int? _value; // Valor seleccionado para el grupo
   String? _selectedDepartment; // Departamento seleccionado
   late bool _isChecked; // Estado del checkbox de ubicación en Santiago
-  Opciones _selectedOption =
+  final Opciones _selectedOption =
       Opciones.departamento; // Opción seleccionada (departamento o posición)
   final GlobalKey qrGlobalKey = GlobalKey(); // Clave global para el QR
 
@@ -115,7 +123,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
         empleado.departamento; // Asigna el departamento seleccionado
     selectedDivisionId = empleado.id_division;
     // Inicializa el controlador de texto con la ubicación actual
-     instagramController  = TextEditingController(text: empleado.instagram);
+    instagramController = TextEditingController(text: empleado.instagram);
     _direccionController = TextEditingController(text: empleado.ubicacion);
     _fetchDivisiones();
   }
@@ -181,7 +189,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
         return 'Operations Department';
       case 'Ventas':
         return 'Sales Department';
-      case 'Coordination Department':
+      case 'Coordinación':
         return 'Coordination Department';
       case 'Aduanas':
         return 'Customs Department';
@@ -189,13 +197,13 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
         return 'Créditos y Cobros';
       case 'Finanzas':
         return 'Finance Department';
-      case 'Administracion':
+      case 'Administración':
         return 'Administration Department';
-      case 'Humano':
+      case 'Recursos Humanos':
         return 'Gestión de Talento Humano';
-      case 'Customers Service':
+      case 'Servicio al cliente':
         return 'Customers Service';
-      case 'Tecnologia':
+      case 'Tecnología':
         return 'Technology Department';
       case 'Product Development':
         return 'Product Development';
@@ -239,7 +247,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
       case 'HighPerformance':
         return ImagenCompania(
             path: "../assets/Firma/highpSomos.png",
-            height: 160,
+            height: 120,
             width: 220,
             color1: const Color(0xFF8CC63F),
             color2: const Color(0xFF0071BC),
@@ -805,7 +813,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(child: CircularProgressIndicator()),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
       try {
@@ -814,9 +822,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
         if (kIsWeb) {
           // Obtiene el tipo MIME del archivo
           String? mimeType = lookupMimeType(file.name);
-          if (mimeType == null) {
-            mimeType = 'application/octet-stream'; // Tipo MIME por defecto
-          }
+          mimeType ??= 'application/octet-stream';
           MediaType mediaType = MediaType.parse(mimeType);
 
           // Para Flutter Web, usa fromBytes
@@ -864,7 +870,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Imagen subida correctamente')),
+            const SnackBar(content: Text('Imagen subida correctamente')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -922,26 +928,6 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
         SnackBar(content: Text('Error al enviar los datos: $e')),
       );
     }
-  }
-
-  // Método para personalizar la decoración de los campos de texto
-  InputDecoration customInputDecoration({required String labelText}) {
-    return InputDecoration(
-      labelText: labelText,
-      labelStyle: const TextStyle(color: Colors.grey),
-      floatingLabelStyle: const TextStyle(color: Colors.black),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFF17A2B8), width: 2.0),
-      ),
-    );
   }
 
   // Widget que construye los campos del formulario
@@ -1135,7 +1121,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
                       });
                     },
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
             const SizedBox(height: 25),
             // Dropdown para seleccionar el grupo (tipo de compañía)
             SizedBox(
@@ -1195,7 +1181,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
                         } else {
                           // Manejar el error, por ejemplo, mostrar un SnackBar
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                                 content: Text(
                                     'No se pudieron cargar los detalles de la división')),
                           );
@@ -1288,19 +1274,25 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
             ),
             const SizedBox(height: 15),
             // Botón para abrir el enlace de contacto
-            Container(
+            SizedBox(
                 height: 45,
                 width: 250,
                 child: TextButton(
                   onPressed: () {
-                    String nombreSinEspacios =
-                        empleado.nombre_empleado.replaceAll(' ', '');
-                    final String url =
-                        "https://info.mclogs.com/${Uri.encodeComponent(nombreSinEspacios)}";
-                    print('URL generada: $url');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Contacto(empleado: empleado),
+                      ),
+                    );
+                    // String nombreSinEspacios =
+                    //     empleado.nombre_empleado.replaceAll(' ', '');
+                    // final String url =
+                    //     "https://info.mclogs.com/${Uri.encodeComponent(nombreSinEspacios)}";
+                    // print('URL generada: $url');
 
-                    // Abre la URL en una nueva pestaña del navegador
-                    html.window.open(url, '_blank');
+                    // // Abre la URL en una nueva pestaña del navegador
+                    // html.window.open(url, '_blank');
                   },
                   style: TextButton.styleFrom(
                     backgroundColor:
@@ -1329,6 +1321,8 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
 
   // Widget que construye los botones de acción
   Widget buildButtons() {
+    final visibilidadusuario =
+        Provider.of<Visibilidadusuarios>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Wrap(
@@ -1339,9 +1333,14 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
           // Botón para guardar los datos
           CustomButton(
             textColor: Colors.white,
-            text: "Guardar",
+            text: visibilidadusuario.mostrarUsuariosInactivos
+                ? "Reactivar"
+                : "Guardar",
             color: const Color(0xFF4CAF50),
             onPressed: () async {
+              setState(() {
+                empleado.estado = "Activo"; // Marca al empleado como inactivo
+              });
               await postUserData(); // Envía los datos al servidor
               if (mounted) {
                 Navigator.of(context)
@@ -1350,48 +1349,51 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
             },
           ),
           // Botón para eliminar al usuario (marcar como inactivo)
-          CustomButton(
-            textColor: Colors.white,
-            text: "Eliminar",
-            color: const Color(0xFFFF5252),
-            onPressed: () async {
-              setState(() {
-                empleado.estado = "Inactivo"; // Marca al empleado como inactivo
-              });
+          if (visibilidadusuario.mostrarUsuariosInactivos == false) ...[
+            CustomButton(
+              textColor: Colors.white,
+              text: "Desactivar",
+              color: const Color(0xFFFF5252),
+              onPressed: () async {
+                setState(() {
+                  empleado.estado =
+                      "Inactivo"; // Marca al empleado como inactivo
+                });
 
-              await postUserData(); // Envía los cambios al servidor
+                await postUserData(); // Envía los cambios al servidor
 
-              if (mounted) {
-                Navigator.of(context)
-                    .pop(true); // Cierra el diálogo y retorna true
-              }
-            },
-          ),
-          // Botón para mostrar el diálogo del QR
-          CustomButton(
-            textColor: Colors.white,
-            text: "QR",
-            color: const Color(0xFF17A2B8),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return (QRDialog(
-                        empleado: empleado)); // Muestra el diálogo del QR
-                  });
-            },
-          ),
-          // Botón para mostrar el diálogo de firma
-          CustomButton(
-            textColor: Colors.white,
-            text: "Firma",
-            color: const Color(0xFF17A2B8),
-            onPressed: () {
-              mostrarDialogoFirma(
-                  context); // Llama al método para mostrar el diálogo de firma
-            },
-          ),
-          // Botón para cancelar y cerrar el diálogo
+                if (mounted) {
+                  Navigator.of(context)
+                      .pop(true); // Cierra el diálogo y retorna true
+                }
+              },
+            ),
+            // Botón para mostrar el diálogo del QR
+            CustomButton(
+              textColor: Colors.white,
+              text: "QR",
+              color: const Color(0xFF17A2B8),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return (QRDialog(
+                          empleado: empleado)); // Muestra el diálogo del QR
+                    });
+              },
+            ),
+            // Botón para mostrar el diálogo de firma
+            CustomButton(
+              textColor: Colors.white,
+              text: "Firma",
+              color: const Color(0xFF17A2B8),
+              onPressed: () {
+                mostrarDialogoFirma(
+                    context); // Llama al método para mostrar el diálogo de firma
+              },
+            ),
+            // Botón para cancelar y cerrar el diálogo
+          ],
           CustomButton(
             text: "Cancelar",
             textColor: Colors.white,
@@ -1418,16 +1420,22 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
     }
 
     return Dialog(
-      child: Container(
-        width: 600, // Ancho del diálogo
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), // Bordes redondeados
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 600, // Ancho del diálogo
+          maxHeight: MediaQuery.of(context).size.height *
+              0.9, // Altura máxima del 80% de la pantalla
         ),
         child: Column(
+          mainAxisSize: MainAxisSize
+              .min, // Ajusta el tamaño del Column al contenido mínimo
           children: [
             // Encabezado del diálogo
             Padding(
-              padding: const EdgeInsets.all(34.0),
+              padding: const EdgeInsets.all(20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1445,362 +1453,19 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
                 ],
               ),
             ),
-          
             // Formulario con scroll para los campos
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
                 child: buildFormFields(), // Construye los campos del formulario
               ),
             ),
-
             // Botones al final del diálogo
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: buildButtons(), // Construye los botones de acción
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget personalizado para campos de texto
-class CustomTextFormField extends StatelessWidget {
-  final String labelText; // Texto de la etiqueta
-  final bool readOnly; // Indica si el campo es de solo lectura
-  final ValueChanged<String>? onChange; // Callback para cambios en el texto
-  final String? initialValue; // Valor inicial del campo
-  final TextEditingController? controller; // Controlador de texto
-
-  const CustomTextFormField({
-    super.key,
-    required this.labelText,
-    this.readOnly = false,
-    this.onChange,
-    this.initialValue,
-    this.controller,
-  });
-
-  static const double kFieldWidth = 250.0; // Ancho constante para campos
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: kFieldWidth, // Establece el ancho del campo
-      child: TextFormField(
-        controller: controller, // Asigna el controlador si existe
-        readOnly: readOnly, // Establece si el campo es de solo lectura
-        initialValue: controller == null
-            ? initialValue
-            : null, // Asigna el valor inicial si no hay controlador
-        textAlign: TextAlign.start, // Alineación del texto
-        decoration: InputDecoration(
-          labelText: labelText, // Texto de la etiqueta
-          labelStyle:
-              const TextStyle(color: Colors.grey), // Estilo de la etiqueta
-          floatingLabelStyle: const TextStyle(
-              color: Colors.black), // Estilo de la etiqueta al flotar
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-            borderSide: const BorderSide(
-                color: Colors.grey, width: 1.0), // Color y ancho del borde
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Bordes redondeados
-            borderSide: const BorderSide(
-                color: Color(0xFF17A2B8),
-                width: 2.0), // Color y ancho del borde al enfocar
-          ),
-        ),
-        onChanged: (v) => onChange != null
-            ? onChange!(v)
-            : null, // Maneja cambios en el texto
-        cursorColor: Colors.black, // Color del cursor
-        maxLines: null, // Permite múltiples líneas
-        style: const TextStyle(color: Colors.black), // Estilo del texto
-      ),
-    );
-  }
-}
-
-// Widget personalizado para botones
-class CustomButton extends StatelessWidget {
-  final String text; // Texto del botón
-  final Color textColor; // Color del texto
-  final Color? color; // Color de fondo del botón
-  final VoidCallback onPressed; // Callback al presionar el botón
-
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.color,
-    required this.onPressed,
-    required this.textColor,
-  });
-
-  static const EdgeInsets kButtonPadding = EdgeInsets.symmetric(
-      horizontal: 40, vertical: 20); // Padding constante para botones
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: onPressed, // Asigna la función al presionar
-      style: FilledButton.styleFrom(
-        backgroundColor: color, // Color de fondo
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10)), // Bordes redondeados
-        padding: kButtonPadding, // Padding del botón
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: textColor), // Estilo del texto
-      ),
-    );
-  }
-}
-
-// Widget Stateful para generar y mostrar el QR
-class QrGenerator extends StatefulWidget {
-  final Empleado empleado; // Objeto empleado con datos para el QR
-  final double size; // Tamaño del QR
-
-  const QrGenerator({
-    super.key,
-    required this.empleado,
-    required this.size,
-  });
-
-  @override
-  State<QrGenerator> createState() => _QrGeneratorState();
-}
-
-// Clase para manejar el estilo del QR
-class QrStyling {
-  final Color color1; // Primer color para el gradiente
-  final Color color2; // Segundo color para el gradiente
-  final Color color3; // Tercer color para el gradiente
-  final String pathLogo; // Ruta del logo dentro del QR
-
-  QrStyling({
-    required this.color1,
-    required this.color2,
-    required this.color3,
-    required this.pathLogo,
-  });
-}
-
-// Estado del widget QrGenerator
-class _QrGeneratorState extends State<QrGenerator> {
-  GlobalKey globalKey =
-      GlobalKey(); // Clave global (no utilizada en este contexto)
-  late Empleado empleados; // Objeto empleado local
-
-  @override
-  void initState() {
-    super.initState();
-    empleados = widget.empleado; // Inicializa el objeto empleado
-  }
-
-  // Método para obtener el estilo del QR basado en la compañía
-  QrStyling obtenerLogo(String? compania) {
-    switch (compania) {
-      case 'Figibox':
-        return QrStyling(
-          color1: const Color(0xFF77A4E8),
-          color2: const Color(0xFF163977),
-          color3: const Color(0xFF163977),
-          pathLogo: "../assets/Firma/figiboxSomos.jpeg",
-        );
-      case 'MCLogistics':
-        return QrStyling(
-          color1: const Color(0xFF8CC63F), // Verde claro
-          color2: const Color(0xFF00A79D), // Verde azulado
-          color3: const Color(0xFF0071BC),
-          pathLogo: "../assets/Logo/Logo_mc.png",
-        );
-      case 'ConsiliaLogistics':
-        return QrStyling(
-          color1: const Color(0xFF8CC63F), // Verde claro
-          color2: const Color(0xFF00A79D), // Verde azulado
-          color3: const Color(0xFF0071BC),
-          pathLogo: "../assets/Logo/Concilialogo.png",
-        );
-      case 'HighPerformance':
-        return QrStyling(
-          color1: const Color(0xFF8CC63F), // Verde claro
-          color2: const Color(0xFF00A79D), // Verde azulado
-          color3: const Color(0xFF0071BC),
-          pathLogo: "../assets/Logo/Logo_mc.png",
-        );
-      default:
-        return QrStyling(
-          color1: const Color(0xFF8CC63F), // Verde claro
-          color2: const Color(0xFF00A79D), // Verde azulado
-          color3: const Color(0xFF0071BC),
-          pathLogo: "",
-        );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String nombreSinEspacios = widget.empleado.nombre_empleado
-        .replaceAll(' ', ''); // Nombre sin espacios
-    QrStyling qrStyling =
-        obtenerLogo(empleados.division); // Obtiene el estilo del QR
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Alineación vertical
-      crossAxisAlignment: CrossAxisAlignment.center, // Alineación horizontal
-      children: [
-        Center(
-            child: Stack(alignment: Alignment.center, children: [
-          ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return LinearGradient(
-                colors: [
-                  qrStyling.color1, // Primer color del gradiente
-                  qrStyling.color2, // Segundo color del gradiente
-                  qrStyling.color3, // Tercer color del gradiente
-                ],
-                begin: Alignment.topLeft, // Inicio del gradiente
-                end: Alignment.bottomRight, // Fin del gradiente
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.srcIn, // Modo de mezcla
-            child: QrImageView(
-              data:
-                  "https://info.mclogs.com/${Uri.encodeComponent(nombreSinEspacios)}", // Datos del QR (URL codificada)
-              version: QrVersions.auto, // Versión automática del QR
-              size: widget.size, // Tamaño del QR
-              gapless: false, // Espacios entre módulos
-              // ignore: deprecated_member_use
-              foregroundColor: Colors.white, // Color base para el ShaderMask
-              backgroundColor: Colors.transparent, // Fondo transparente
-              errorCorrectionLevel:
-                  QrErrorCorrectLevel.L, // Nivel de corrección de errores
-              dataModuleStyle: const QrDataModuleStyle(
-                dataModuleShape:
-                    QrDataModuleShape.circle, // Forma circular de los módulos
-              ),
-              eyeStyle: const QrEyeStyle(
-                eyeShape: QrEyeShape.circle, // Forma circular de los ojos
-              ),
-              // Espaciado interno
-            ),
-          ),
-          // Capa blanca en el centro del QR
-          Container(
-            width: 30, // Tamaño de la capa blanca
-            height: 30,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white,
-            ), // Estilo de la capa blanca
-          ),
-          // Logo en el centro del QR
-          SizedBox(
-            width: 30,
-            height: 30,
-            child: Image.asset(
-              qrStyling.pathLogo,
-              fit: BoxFit.contain,
-            ),
-          )
-        ])),
-      ],
-    );
-  }
-}
-
-// Widget para mostrar el diálogo del QR
-class QRDialog extends StatelessWidget {
-  final Empleado empleado; // Objeto empleado con datos para el QR
-  final ScreenshotController screenshotController =
-      ScreenshotController(); // Controlador para capturar el QR
-
-  QRDialog({super.key, required this.empleado});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)), // Bordes redondeados
-      child: Container(
-        padding: const EdgeInsets.all(16.0), // Padding interno
-        width: 300, // Ancho del diálogo
-        height: 350, // Altura del diálogo
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Alineación vertical
-          children: [
-            // Generador del QR dentro de un Screenshot
-            Screenshot(
-                controller: screenshotController,
-                child: QrGenerator(empleado: empleado, size: 230)),
-            const SizedBox(height: 20),
-            // Botones para descargar o cancelar
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly, // Espaciado entre botones
-              children: [
-                // Botón para descargar el QR
-                FilledButton(
-                  onPressed: () async {
-                    // Capturar el QR como imagen
-                    final Uint8List? image =
-                        await screenshotController.capture();
-
-                    if (image != null) {
-                      // Crear un blob de la imagen
-                      final blob = html.Blob([image], 'image/png');
-                      final url = html.Url.createObjectUrlFromBlob(blob);
-
-                      // Crear un ancla invisible para descargar la imagen
-                      final anchor = html.AnchorElement(href: url)
-                        ..setAttribute('download', 'qr_code.png')
-                        ..click();
-
-                      // Limpiar la URL
-                      html.Url.revokeObjectUrl(url);
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.green[50], // Color de fondo
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10)), // Bordes redondeados
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 20), // Padding
-                  ),
-                  child: const Text(
-                    "Descargar",
-                    style: TextStyle(color: Colors.green), // Estilo del texto
-                  ),
-                ),
-                // Botón para cancelar y cerrar el diálogo
-                FilledButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Cierra el diálogo
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red[50], // Color de fondo
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10)), // Bordes redondeados
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 20), // Padding
-                  ),
-                  child: const Text(
-                    "Cancelar",
-                    style: TextStyle(color: Colors.red), // Estilo del texto
-                  ),
-                ),
-              ],
-            )
           ],
         ),
       ),
