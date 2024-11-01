@@ -275,7 +275,7 @@ class _HomescreenState extends State<Homescreen> {
                                     provider.mostrarUsuariosInactivos
                                         ? "Mostrar Activos"
                                         : "Mostrar Inactivos",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
                                   );

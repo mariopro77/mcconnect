@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 
-class Empleado with ChangeNotifier {
+class Empleado {
   int? id_empleado;
   String nombre_empleado;
   String? telefono_empleado;
@@ -113,10 +113,50 @@ Future<List<Empleado>> fetchempleados(String search) async {
     // Convierte cada elemento del JSON en una instancia de [Empleados]
     List<Empleado> empleado =
         data.map((item) => Empleado.fromJson(item)).toList();
+      
+      // for (var emp in empleado) {
+      //   print('ID: ${emp.id_empleado}, Nombre: ${emp.nombre_empleado}');
+      // }
+
 
     return empleado;
   } else {
     // Si la petición falla, lanza una excepción
     throw Exception("Hubo un error al cargar los datos");
+  }
+}
+
+class ListaEmpleados extends ChangeNotifier {
+  List<Empleado> _empleados = [];
+
+  /// Getter para acceder a la lista de empleados
+  List<Empleado> get empleados => _empleados;
+
+  /// Método para obtener empleados desde la API
+  Future<void> fetchEmpleados(String search) async {
+    try {
+      _empleados = await fetchempleados(search);
+      print(empleados);
+      for (var emp in empleados) {
+        print('ID: ${emp.id_empleado}, Nombre: ${emp.nombre_empleado}');
+      }
+      notifyListeners();
+    } catch (e) {
+      // Manejar errores según sea necesario
+      print('Error al obtener empleados: $e');
+      // Puedes agregar lógica para manejar errores en la UI
+    }
+  }
+
+
+  /// Método para obtener un empleado por su ID
+ Empleado? getEmpleadoByNombre(String nombre) {
+    try {
+      return _empleados.firstWhere(
+        (empleado) => empleado.nombre_empleado.toLowerCase() == nombre.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

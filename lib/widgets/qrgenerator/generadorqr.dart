@@ -1,7 +1,6 @@
 // Widget Stateful para generar y mostrar el QR
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mcconnect/Providers/listaempleados.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -53,6 +52,13 @@ class _QrGeneratorState extends State<QrGenerator> {
   QrStyling obtenerLogo(String? compania) {
     switch (compania) {
       case 'Figibox':
+        return QrStyling(
+          color1: const Color(0xFF77A4E8),
+          color2: const Color(0xFF163977),
+          color3: const Color(0xFF163977),
+          pathLogo: "../assets/Firma/figiboxSomos.jpeg",
+        );
+        case 'Figibox-Santiago':
         return QrStyling(
           color1: const Color(0xFF77A4E8),
           color2: const Color(0xFF163977),
@@ -125,7 +131,7 @@ class _QrGeneratorState extends State<QrGenerator> {
             blendMode: BlendMode.srcIn, // Modo de mezcla
             child: QrImageView(
               data:
-                  "https://info.mclogs.com/${Uri.encodeComponent(nombreSinEspacios)}", // Datos del QR (URL codificada)
+                  "http://192.168.67.208:8080/#/contacto/${Uri.encodeComponent(widget.empleado.nombre_empleado)}", // Datos del QR (URL codificada)
               version: QrVersions.auto, // Versión automática del QR
               size: widget.size, // Tamaño del QR
               gapless: false, // Espacios entre módulos

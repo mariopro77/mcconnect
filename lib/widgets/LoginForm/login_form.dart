@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcconnect/views/Screens/Homescreen.dart';
+import 'package:go_router/go_router.dart';
 
 // Widget que representa el formulario de inicio de sesión
 class LoginForm extends StatelessWidget {
@@ -88,9 +88,7 @@ class LoginForm extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Navegar a la pantalla de inicio después de iniciar sesión
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const Homescreen()),
-                      );
+                     context.go('/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF17A2B8), // Color de fondo del botón

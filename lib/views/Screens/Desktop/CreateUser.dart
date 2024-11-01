@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mcconnect/Providers/listaempleados.dart';
-import 'package:mcconnect/views/Screens/Desktop/Changeuser_desktop.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones.dart';
 import 'package:mcconnect/views/Screens/Desktop/Divisiones/divisiones_backend.dart';
-import 'package:mcconnect/views/Screens/Homescreen.dart';
 import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart'; // Importa file_picker para Flutter Web
@@ -14,7 +12,6 @@ import 'package:mcconnect/widgets/Botones/Botonesrectangulares.dart';
 import 'package:mcconnect/widgets/Campos/campopersonalizado.dart';
 import 'package:mime/mime.dart';
 import 'dart:io' show File, Platform;
-import 'dart:html' as html;
 
 /// Clase que representa el formulario para crear un nuevo usuario.
 /// Extiende de [StatefulWidget] ya que mantiene el estado interno.

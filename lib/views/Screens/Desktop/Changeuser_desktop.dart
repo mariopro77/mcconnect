@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,6 +28,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
+
+import 'package:url_launcher/url_launcher.dart';
 
 // Enumeración para las opciones de encabezado
 enum Opciones { departamento, posicion }
@@ -58,8 +61,8 @@ class ImagenCompania {
   final double width; // Ancho de la imagen
   final Color color1; // Primer color para el diseño
   final Color color2; // Segundo color para el diseño
-  final double contenedorheight; // Altura del contenedor
-  final double contenedorwidth; // Ancho del contenedor
+  final double? contenedorheight; // Altura del contenedor
+  final double? contenedorwidth; // Ancho del contenedor
 
   ImagenCompania({
     required this.path,
@@ -67,8 +70,8 @@ class ImagenCompania {
     required this.width,
     required this.color1,
     required this.color2,
-    required this.contenedorheight,
-    required this.contenedorwidth,
+    this.contenedorheight,
+    this.contenedorwidth,
   });
 }
 
@@ -219,49 +222,75 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
     switch (compania) {
       case 'Figibox':
         return ImagenCompania(
-            path: "../assets/Firma/figiboxSomos.jpeg",
-            height: 50,
-            width: 170,
-            color1: const Color(0xFF77A4E8),
-            color2: const Color(0xFF163977),
-            contenedorheight: 240,
-            contenedorwidth: 750);
+          path: "../assets/Firma/figiboxSomos.jpeg",
+          height: 50,
+          width: 170,
+          color1: const Color(0xFF77A4E8),
+          color2: const Color(0xFF163977),
+          // contenedorheight: 240,
+          // contenedorwidth: 750
+        );
       case 'MCLogistics':
         return ImagenCompania(
-            path: "../assets/Firma/Mclogisticssomos.png",
-            height: 120,
-            width: 220,
-            color1: const Color(0xFF8CC63F),
-            color2: const Color(0xFF0071BC),
-            contenedorheight: 300,
-            contenedorwidth: 750);
+          path: "../assets/Firma/Mclogisticssomos.png",
+          height: 120,
+          width: 220,
+          color1: const Color(0xFF8CC63F),
+          color2: const Color(0xFF0071BC),
+          // contenedorheight: 300,
+          // contenedorwidth: 750
+        );
       case 'ConsiliaLogistics':
         return ImagenCompania(
-            path: "../assets/Firma/ConsiliaSomos.png",
-            height: 140,
-            width: 220,
-            color1: const Color(0xFF2B388C),
-            color2: const Color(0xFFA2C954),
-            contenedorheight: 300,
-            contenedorwidth: 750);
+          path: "../assets/Firma/ConsiliaSomos.png",
+          height: 140,
+          width: 220,
+          color1: const Color(0xFF2B388C),
+          color2: const Color(0xFFA2C954),
+          // contenedorheight: 300,
+          // contenedorwidth: 750
+        );
       case 'HighPerformance':
         return ImagenCompania(
-            path: "../assets/Firma/highpSomos.png",
-            height: 120,
-            width: 220,
-            color1: const Color(0xFF8CC63F),
-            color2: const Color(0xFF0071BC),
-            contenedorheight: 300,
-            contenedorwidth: 750);
+          path: "../assets/Firma/highpSomos.png",
+          height: 140,
+          width: 200,
+          color1: const Color(0xFF8CC63F),
+          color2: const Color(0xFF0071BC),
+          // contenedorheight: 300,
+          // contenedorwidth: 750
+        );
+
+      case 'MCLogistics-Santiago':
+        return ImagenCompania(
+          path: "../assets/Firma/Mclogisticssomos.png",
+          height: 120,
+          width: 220,
+          color1: const Color(0xFF8CC63F),
+          color2: const Color(0xFF0071BC),
+          // contenedorheight: 300,
+          // contenedorwidth: 750
+        );
+      case 'Figibox-Santiago':
+        return ImagenCompania(
+          path: "../assets/Firma/figiboxSomos.jpeg",
+          height: 50,
+          width: 170,
+          color1: const Color(0xFF77A4E8),
+          color2: const Color(0xFF163977),
+          // contenedorheight: 240,
+          // contenedorwidth: 750
+        );
       default:
         return ImagenCompania(
-            path: "../assets/Firma/Mclogisticssomos.png",
-            height: 100,
-            width: 100,
-            color1: const Color(0xFF8CC63F),
-            color2: const Color(0xFF0071BC),
-            contenedorheight: 300,
-            contenedorwidth: 750);
+          path: "../assets/Firma/Mclogisticssomos.png",
+          height: 120,
+          width: 220,
+          color1: const Color(0xFF8CC63F),
+          color2: const Color(0xFF0071BC),
+          // contenedorheight: 300,
+          // contenedorwidth: 750
+        );
     }
   }
 
@@ -290,384 +319,425 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
                           // Captura de pantalla para la firma
                           Screenshot(
                             controller: screenshotController,
-                            child: Container(
-                              width: imagenCompania.contenedorwidth,
-                              height: imagenCompania.contenedorheight,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                  left: BorderSide(
-                                    width: 8,
-                                    color: imagenCompania.color1,
-                                  ),
-                                ),
-                              ),
+                            child: IntrinsicHeight(
                               child: Container(
-                                width: double.infinity,
+                                width: 750,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   border: Border(
                                     left: BorderSide(
                                       width: 8,
-                                      color: imagenCompania.color2,
+                                      color: imagenCompania.color1,
                                     ),
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        color: Colors.white,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Stack(
-                                                  children: [
-                                                    Image.asset(
-                                                      "../assets/Firma/Background_firma.jpeg", // Asegúrate de que la ruta es correcta
-                                                      height: 250,
-                                                      width: 534,
-                                                      fit: BoxFit.fill,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Row(
+                                child: Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      left: BorderSide(
+                                        width: 8,
+                                        color: imagenCompania.color2,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          color: Colors.white,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Stack(
+                                                    children: [
+                                                      ConstrainedBox(
+                                                        constraints: BoxConstraints(
+                                                          maxHeight: 280
+                                                        ),
+                                                        child: Image.asset(
+                                                          "../assets/Firma/Background_firma.jpeg", // Asegúrate de que la ruta es correcta
+                                                          width: 534,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16.0),
+                                                            child: Positioned(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
-                                                                  SizedBox(
-                                                                    width: 180,
-                                                                    child: Text(
-                                                                      widget
-                                                                          .empleado
-                                                                          .nombre_empleado,
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            20,
+                                                                  Row(
+                                                                    children: [
+                                                                      Positioned(
+                                                                        top: 0,
+                                                                        child:
+                                                                            SizedBox(
+                                                                          width:
+                                                                              180,
+                                                                          child:
+                                                                              Text(
+                                                                            widget.empleado.nombre_empleado,
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontSize: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              // Actualización del texto del departamento/posición
-                                                              Text(
-                                                                tempSelectedOption ==
-                                                                        Opciones
-                                                                            .departamento
-                                                                    ? obtenerTextoDepartamento(widget
-                                                                        .empleado
-                                                                        .departamento)
-                                                                    : widget.empleado
-                                                                            .posicion_empleado ??
-                                                                        "",
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          91,
-                                                                          91,
-                                                                          91),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 15),
-                                                              // Mostrar teléfono y extensión si están disponibles
-                                                              if ((widget.empleado
-                                                                              .telefono_empleado !=
-                                                                          null &&
-                                                                      widget
-                                                                          .empleado
-                                                                          .telefono_empleado!
-                                                                          .isNotEmpty) &&
-                                                                  (widget.empleado
-                                                                              .extension_empleado !=
-                                                                          null &&
-                                                                      widget.empleado
-                                                                              .telefono_empleado !=
-                                                                          null &&
-                                                                      widget
-                                                                          .empleado
-                                                                          .telefono_empleado!
-                                                                          .isNotEmpty))
-                                                                Row(
-                                                                  children: [
-                                                                    const FaIcon(
-                                                                      FontAwesomeIcons
-                                                                          .phone,
-                                                                      size: 15,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      widget.empleado
-                                                                              .telefono_empleado ??
-                                                                          "",
-                                                                      style:
-                                                                          const TextStyle(),
-                                                                    ),
-                                                                    Text(
-                                                                      ", Ext${widget.empleado.extension_empleado ?? ""}",
-                                                                      style:
-                                                                          const TextStyle(),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              const SizedBox(
-                                                                  height: 5),
-                                                              // Mostrar WhatsApp si está disponible
-                                                              if (widget.empleado
-                                                                          .flota_empleado !=
-                                                                      null &&
-                                                                  widget
-                                                                      .empleado
-                                                                      .flota_empleado!
-                                                                      .isNotEmpty)
-                                                                Row(
-                                                                  children: [
-                                                                    const FaIcon(
-                                                                      FontAwesomeIcons
-                                                                          .whatsapp,
-                                                                      size: 15,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      widget.empleado
-                                                                              .flota_empleado ??
-                                                                          "",
-                                                                      style:
-                                                                          const TextStyle(),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              const SizedBox(
-                                                                  height: 5),
-                                                              // Mostrar sitio web si está disponible
-                                                              if (widget.empleado
-                                                                          .web !=
-                                                                      null &&
-                                                                  widget
-                                                                      .empleado
-                                                                      .web!
-                                                                      .isNotEmpty)
-                                                                Row(
-                                                                  children: [
-                                                                    const FaIcon(
-                                                                      FontAwesomeIcons
-                                                                          .globe,
-                                                                      size: 15,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      widget.empleado
-                                                                              .web ??
-                                                                          "",
-                                                                      style:
-                                                                          const TextStyle(),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              const SizedBox(
-                                                                  height: 5),
-                                                              // Mostrar ubicación si está disponible
-                                                              if (widget.empleado
-                                                                          .ubicacion !=
-                                                                      null &&
-                                                                  widget
-                                                                      .empleado
-                                                                      .ubicacion!
-                                                                      .isNotEmpty)
-                                                                Row(
-                                                                  children: [
-                                                                    const FaIcon(
-                                                                      FontAwesomeIcons
-                                                                          .locationDot,
-                                                                      size: 20,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    SizedBox(
+                                                                  // Actualización del texto del departamento/posición
+                                                                  Positioned(
+                                                                    top: 0,
+                                                                    left: 0,
+                                                                    child:
+                                                                        SizedBox(
                                                                       width:
                                                                           200,
                                                                       child:
                                                                           Text(
-                                                                        widget.empleado.ubicacion ??
-                                                                            "",
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                12),
+                                                                        tempSelectedOption ==
+                                                                                Opciones.departamento
+                                                                            ? obtenerTextoDepartamento(widget.empleado.departamento)
+                                                                            : widget.empleado.posicion_empleado ?? "",
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          color: Color.fromARGB(
+                                                                              255,
+                                                                              91,
+                                                                              91,
+                                                                              91),
+                                                                        ),
                                                                       ),
                                                                     ),
-                                                                  ],
-                                                                ),
-                                                            ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          15),
+                                                                           Row(
+                                                                      children: [
+                                                                        const FaIcon(
+                                                                          FontAwesomeIcons.envelope,
+                                                                          size:
+                                                                              15,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        Text(
+                                                                          widget.empleado.correo_empleado ??
+                                                                              "",
+                                                                          style:
+                                                                              const TextStyle(),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          5),
+                                                                  // Mostrar teléfono y extensión si están disponibles
+                                                                  if ((widget.empleado.telefono_empleado !=
+                                                                              null &&
+                                                                          widget
+                                                                              .empleado
+                                                                              .telefono_empleado!
+                                                                              .isNotEmpty) &&
+                                                                      (widget.empleado.extension_empleado !=
+                                                                              null &&
+                                                                          widget.empleado.telefono_empleado !=
+                                                                              null &&
+                                                                          widget
+                                                                              .empleado
+                                                                              .telefono_empleado!
+                                                                              .isNotEmpty))
+                                                                    Row(
+                                                                      children: [
+                                                                        const FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .phone,
+                                                                          size:
+                                                                              15,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        Text(
+                                                                          widget.empleado.telefono_empleado ??
+                                                                              "",
+                                                                          style:
+                                                                              const TextStyle(),
+                                                                        ),
+                                                                        Text(
+                                                                          ", Ext${widget.empleado.extension_empleado ?? ""}",
+                                                                          style:
+                                                                              const TextStyle(),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          5),
+                                                                  // Mostrar WhatsApp si está disponible
+                                                                  if (widget.empleado
+                                                                              .flota_empleado !=
+                                                                          null &&
+                                                                      widget
+                                                                          .empleado
+                                                                          .flota_empleado!
+                                                                          .isNotEmpty)
+                                                                    Row(
+                                                                      children: [
+                                                                        const FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .whatsapp,
+                                                                          size:
+                                                                              15,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        Text(
+                                                                          widget.empleado.flota_empleado ??
+                                                                              "",
+                                                                          style:
+                                                                              const TextStyle(),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          5),
+                                                                  // Mostrar sitio web si está disponible
+                                                                  if (widget.empleado
+                                                                              .web !=
+                                                                          null &&
+                                                                      widget
+                                                                          .empleado
+                                                                          .web!
+                                                                          .isNotEmpty)
+                                                                    Row(
+                                                                      children: [
+                                                                        const FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .globe,
+                                                                          size:
+                                                                              15,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        Text(
+                                                                          widget.empleado.web ??
+                                                                              "",
+                                                                          style:
+                                                                              const TextStyle(),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          5),
+                                                                  // Mostrar ubicación si está disponible
+                                                                  if (widget.empleado
+                                                                              .ubicacion !=
+                                                                          null &&
+                                                                      widget
+                                                                          .empleado
+                                                                          .ubicacion!
+                                                                          .isNotEmpty)
+                                                                    Row(
+                                                                      children: [
+                                                                        const FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .locationDot,
+                                                                          size:
+                                                                              20,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            widget.empleado.ubicacion ??
+                                                                                "",
+                                                                            style:
+                                                                                const TextStyle(fontSize: 12),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 40),
-                                                        // Imagen de la compañía
-                                                        Image.asset(
-                                                          imagenCompania.path,
-                                                          height: imagenCompania
-                                                              .height,
-                                                          width: imagenCompania
-                                                              .width,
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            // Sección del QR
-                                            Container(
-                                              alignment: Alignment.center,
-                                              height: 250,
-                                              width: 200,
-                                              decoration: const BoxDecoration(
-                                                color: Color.fromARGB(
-                                                    255, 239, 239, 239),
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Visibility(
-                                                    visible: true,
-                                                    maintainState: true,
-                                                    child: Screenshot(
-                                                      controller:
-                                                          qrScreenshotController,
-                                                      child: QrGenerator(
-                                                        empleado: empleado,
-                                                        size: 170,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 1),
-                                                  const Text(
-                                                    "Contáctame",
-                                                    style: TextStyle(
-                                                        color: Colors.grey),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    // Sección inferior del diálogo, si el tipo de empleado no es 'ASW'
-                                    empleado.division != "Figibox"
-                                        ? Container(
-                                            height: 50,
-                                            color: const Color.fromARGB(
-                                                255, 228, 228, 228),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      const Text(
-                                                        "Certified by",
-                                                        style: TextStyle(
-                                                            color: Colors.grey),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      // Imagen de certificación BASC
-                                                      Image.asset(
-                                                        "../assets/Firma/BASC.png", // Asegúrate de que la ruta es correcta
-                                                        height: 40,
-                                                        width: 40,
-                                                      ),
-                                                      const SizedBox(width: 10),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(top: 8.0),
-                                                        child: Image.asset(
-                                                          "../assets/Firma/OEA.png", // Asegúrate de que la ruta es correcta
-                                                          height: 60,
-                                                          width: 60,
-                                                        ),
+                                                          const SizedBox(
+                                                              width: 40),
+                                                          // Imagen de la compañía
+                                                          Image.asset(
+                                                            imagenCompania.path,
+                                                            height:
+                                                                imagenCompania
+                                                                    .height,
+                                                            width:
+                                                                imagenCompania
+                                                                    .width,
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
-                                                  // Si el tipo es 'McLogs', mostrar miembros adicionales
-                                                  empleado.division ==
-                                                          'MCLogistics'
-                                                      ? Row(
-                                                          children: [
-                                                            const Text(
-                                                              "Members",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .grey),
-                                                            ),
-                                                            Image.asset(
-                                                              "../assets/Firma/ADAA.png",
-                                                              height: 70,
-                                                              width: 60,
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 5),
-                                                            Image.asset(
-                                                              "../assets/Firma/ASODEC.png",
-                                                              height: 80,
-                                                              width: 80,
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 10),
-                                                            Image.asset(
-                                                              "../assets/Firma/Adacam.png",
-                                                              height: 60,
-                                                              width: 60,
-                                                            ),
-                                                          ],
-                                                        )
-                                                      : const SizedBox
-                                                          .shrink(), // Si no, no mostrar nada
                                                 ],
                                               ),
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                  ],
+                                              // Sección del QR
+                                              Container(
+                                                alignment: Alignment.center,
+                                                height: 280,
+                                                width: 200,
+                                                decoration: const BoxDecoration(
+                                                  color: Color.fromARGB(255, 244, 240, 240),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Visibility(
+                                                      visible: true,
+                                                      maintainState: true,
+                                                      child: Screenshot(
+                                                        controller:
+                                                            qrScreenshotController,
+                                                        child: QrGenerator(
+                                                          empleado: empleado,
+                                                          size: 170,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 1),
+                                                    const Text(
+                                                      "Contáctame",
+                                                      style: TextStyle(
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      // Sección inferior del diálogo, si el tipo de empleado no es 'ASW'
+                                      empleado.division != "Figibox" &&
+                                              empleado.division !=
+                                                  "Figibox-Santiago"
+                                          ? Container(
+                                              height: 50,
+                                              color: const Color.fromARGB(
+                                                  255, 228, 228, 228),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        const Text(
+                                                          "Certified by",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        // Imagen de certificación BASC
+                                                        Image.asset(
+                                                          "../assets/Firma/BASC.png", // Asegúrate de que la ruta es correcta
+                                                          height: 40,
+                                                          width: 40,
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 10),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 8.0),
+                                                          child: Image.asset(
+                                                            "../assets/Firma/OEA.png", // Asegúrate de que la ruta es correcta
+                                                            height: 60,
+                                                            width: 60,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    // Si el tipo es 'McLogs', mostrar miembros adicionales
+                                                    empleado.division ==
+                                                            'MCLogistics'
+                                                        ? Row(
+                                                            children: [
+                                                              const Text(
+                                                                "Members",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .grey),
+                                                              ),
+                                                              Image.asset(
+                                                                "../assets/Firma/ADAA.png",
+                                                                height: 70,
+                                                                width: 60,
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 5),
+                                                              Image.asset(
+                                                                "../assets/Firma/ASODEC.png",
+                                                                height: 80,
+                                                                width: 80,
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 10),
+                                                              Image.asset(
+                                                                "../assets/Firma/Adacam.png",
+                                                                height: 60,
+                                                                width: 60,
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : const SizedBox
+                                                            .shrink(), // Si no, no mostrar nada
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -861,7 +931,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
           String nameSaved = response.data['name_saved'];
 
           // Construye la URL completa de la imagen
-          String imageUrl = 'http://localhost:4000/public/$nameSaved';
+          String imageUrl = 'http://192.168.67.208:4000/public/$nameSaved';
 
           setState(() {
             _uploadedImageUrl = imageUrl; // Almacena la URL de la imagen subida
@@ -886,6 +956,19 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
           SnackBar(content: Text('Error al subir la imagen: $e')),
         );
       }
+    }
+  }
+
+  void _MostrarContactoURL(BuildContext context) async {
+    final Uri url =
+        Uri.parse('http://localhost:4000/contacto/${empleado.nombre_empleado}');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir la página de contacto')),
+      );
     }
   }
 
@@ -1278,22 +1361,7 @@ class ChangeuserDesktopState extends State<ChangeuserDesktop> {
                 height: 45,
                 width: 250,
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Contacto(empleado: empleado),
-                      ),
-                    );
-                    // String nombreSinEspacios =
-                    //     empleado.nombre_empleado.replaceAll(' ', '');
-                    // final String url =
-                    //     "https://info.mclogs.com/${Uri.encodeComponent(nombreSinEspacios)}";
-                    // print('URL generada: $url');
-
-                    // // Abre la URL en una nueva pestaña del navegador
-                    // html.window.open(url, '_blank');
-                  },
+                  onPressed: () => _MostrarContactoURL(context),
                   style: TextButton.styleFrom(
                     backgroundColor:
                         Colors.green[50], // Cambia el color de fondo
