@@ -10,6 +10,9 @@ const app = express();
 
 app.use(cors());
 
+//para poner en publico habilita
+const IP_ADDRESS = '0.0.0.0';
+
 
 // Configurar dotenv para cargar el archivo .env desde la ruta específica
 dotenv.config({ path: './.env' });
@@ -611,6 +614,7 @@ app.get('/contacto/:id', (req, res) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto de ${empleado.nombre_empleado}</title>
+    <meta property="og:title" content=empleado.nombre_empleado>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling/lib/qr-code-styling.js"></script>
@@ -894,6 +898,11 @@ app.use((err, req, res, next) => {
     }
 });
 
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+// })
+// exports.api = functions.https.onRequest(app);
+
+app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server is running on port ${PORT}`);
-})
+});

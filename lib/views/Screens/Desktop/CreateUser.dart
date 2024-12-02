@@ -171,7 +171,7 @@ class CreateUserState extends State<CreateUser> {
           String imageUrl = 'http://localhost:4000/public/$nameSaved';
 
           setState(() {
-            _uploadedImageUrl = imageUrl; // Almacena la URL de la imagen subida
+            _uploadedImageUrl = imageUrl; // Almacenaa URL de la imagen subida
             empleado!.imagen_empleado =
                 imageUrl; // Actualiza la imagen del empleado
           });

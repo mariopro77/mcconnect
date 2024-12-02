@@ -101,7 +101,9 @@ Future<List<Empleado>> fetchempleados(String search) async {
   final encodedSearch = Uri.encodeQueryComponent(search);
 
   // Construye la URL de la API con la consulta de búsqueda
-  final url = 'http://localhost:4000/api/verempleado?search=$encodedSearch';
+  
+  final url = 'http://0.0.0.0:4000/api/verempleado?search=$encodedSearch';
+  // final url = 'http://localhost:4000/api/verempleado?search=$encodedSearch';
 
   // Realiza una petición GET a la API
   final response = await http.get(Uri.parse(url));

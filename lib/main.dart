@@ -6,16 +6,20 @@ import 'package:mcconnect/views/Screens/Homescreen.dart';
 import 'package:mcconnect/widgets/LoginForm/login_form.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Necesario para inicializar Firebase en Flutter
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
         create: (context) => Visibilidadusuarios(),
       ),
-      // ChangeNotifierProvider(
-      //   create: (context) => Empleado(),
-      // ),
       ChangeNotifierProvider(
         create: (context) => ListaEmpleados(),
       ),
@@ -29,7 +33,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Configuración de GoRouter
     final GoRouter router = GoRouter(
       initialLocation: '/',
       routes: [
@@ -47,9 +50,7 @@ class MainApp extends StatelessWidget {
           path: '/contacto/:nombre',
           name: 'contacto',
           builder: (context, state) {
-            // Obtener el nombre codificado desde los parámetros de la ruta
             final nombreCodificado = state.pathParameters['nombre'];
-            // Decodificar el nombre para manejar espacios y caracteres especiales
             final nombre = Uri.decodeComponent(nombreCodificado ?? '');
 
             if (nombre.isEmpty) {
@@ -59,25 +60,20 @@ class MainApp extends StatelessWidget {
               );
             }
 
-            final listaEmpleados =
-                Provider.of<ListaEmpleados>(context, listen: false);
+            final listaEmpleados = Provider.of<ListaEmpleados>(context, listen: false);
 
             return FutureBuilder<void>(
-              future: listaEmpleados.fetchEmpleados(
-                  ''), // Puedes pasar el término de búsqueda si es necesario
+              future: listaEmpleados.fetchEmpleados(''),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Muestra un indicador de carga mientras se obtienen los datos
                   return const Scaffold(
                     body: Center(child: CircularProgressIndicator()),
                   );
                 } else if (snapshot.hasError) {
-                  // Maneja los errores si los hay
                   return const Scaffold(
                     body: Center(child: Text('Error al cargar los datos')),
                   );
                 } else {
-                  // Los datos ya están cargados, podemos obtener el empleado por nombre
                   final empleado = listaEmpleados.getEmpleadoByNombre(nombre);
                   if (empleado == null) {
                     print('Empleado no encontrado.');

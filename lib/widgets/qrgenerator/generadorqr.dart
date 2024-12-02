@@ -130,8 +130,8 @@ class _QrGeneratorState extends State<QrGenerator> {
             },
             blendMode: BlendMode.srcIn, // Modo de mezcla
             child: QrImageView(
-              data:
-                  "http://192.168.67.208:8080/#/contacto/${Uri.encodeComponent(widget.empleado.nombre_empleado)}", // Datos del QR (URL codificada)
+              data:"http://192.168.67.208:8080/contacto/${Uri.encodeComponent(widget.empleado.nombre_empleado)}",
+                  // "http://192.168.67.208:8080/#/contacto/${Uri.encodeComponent(widget.empleado.nombre_empleado)}", // Datos del QR (URL codificada)
               version: QrVersions.auto, // Versión automática del QR
               size: widget.size, // Tamaño del QR
               gapless: false, // Espacios entre módulos
